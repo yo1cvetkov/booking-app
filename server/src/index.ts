@@ -2,6 +2,9 @@ import express, { type Request, type Response } from "express";
 import cors from "cors";
 
 import "dotenv/config";
+import mongoose from "mongoose";
+
+mongoose.connect(process.env.DB_CONNECTION_STRING as string);
 
 const app = express();
 
