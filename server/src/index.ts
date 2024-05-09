@@ -1,7 +1,8 @@
-import express, { type Request, type Response } from "express";
+import express from "express";
 import cors from "cors";
 
 import userRoutes from "./routes/users";
+import authRoutes from "./routes/auth";
 
 import "dotenv/config";
 import mongoose from "mongoose";
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 
 app.listen(3000, () => {
