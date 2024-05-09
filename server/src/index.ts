@@ -1,6 +1,8 @@
 import express, { type Request, type Response } from "express";
 import cors from "cors";
 
+import userRoutes from "./routes/users";
+
 import "dotenv/config";
 import mongoose from "mongoose";
 
@@ -14,9 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 
-app.get("/api/test", async (req: Request, res: Response) => {
-  res.json({ message: "Hello from server" });
-});
+app.use("/api/users", userRoutes);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
