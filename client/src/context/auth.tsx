@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     mutationFn: loginApi,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      toast.success("Logged in successfully");
+      toast.success("Logged in successfully.");
     },
     onError: (error) => {
       console.error(error);

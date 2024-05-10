@@ -25,6 +25,7 @@ export const UserRoutes = () => {
         disabled={isLoggingOut}
         variant={"ghost"}
         size={"icon"}
+        role="signOut"
         onClick={() => {
           logout(undefined, {
             onSuccess: () => {

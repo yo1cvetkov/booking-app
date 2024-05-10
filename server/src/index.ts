@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 
+import path from "path";
+
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
 
@@ -25,6 +27,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(express.static(path.join(__dirname, "../../client/dist")));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
