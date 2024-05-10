@@ -1,12 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, getRouteApi, useNavigate } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { TRegisterSchema, registerSchema } from "@/schemas/auth";
 import { useRegister } from "@/services/auth/useRegister";
 import { Loader2 } from "lucide-react";
+import { z } from "zod";
+
+const routeApi = getRouteApi("/register");
 
 const Register = () => {
   const form = useForm<TRegisterSchema>({
@@ -22,8 +25,19 @@ const Register = () => {
 
   const { mutate: signup, isPending: isSigningUp } = useRegister();
 
+  const navigate = useNavigate();
+
+  const search = routeApi.useSearch();
+
   async function handleSubmit(data: TRegisterSchema) {
-    signup({ data });
+    signup(
+      { data },
+      {
+        onSuccess: () => {
+          navigate({ to: search.redirect });
+        },
+      }
+    );
   }
 
   return (
@@ -114,4 +128,7 @@ const Register = () => {
 
 export const Route = createFileRoute("/register")({
   component: Register,
+  validateSearch: z.object({
+    redirect: z.string().catch("/"),
+  }),
 });

@@ -1,38 +1,43 @@
 import { createContext } from "react";
 
 import { validateToken } from "@/services/auth/apiAuth";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { UseMutateFunction, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { login as loginApi } from "@/services/auth/apiAuth";
+import { login as loginApi, logout as logoutApi } from "@/services/auth/apiAuth";
 import { toast } from "sonner";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 
 type TLogin = {
   email: string;
   password: string;
 };
 
+type TLoginMutationFn = UseMutateFunction<
+  AxiosResponse<unknown, unknown>,
+  Error,
+  {
+    data: TLogin;
+  },
+  unknown
+>;
+
+type TLogoutMutationFn = UseMutateFunction<AxiosResponse<unknown, unknown>, Error, void, unknown>;
+
 export interface IAuthContext {
   isLoadingUser: boolean;
   getCurrentUser: () => Promise<{ userId: string } | null>;
-  isAuthenticated?: boolean;
-  login: (data: TLogin) => void;
-  logout: () => void;
+  login: TLoginMutationFn;
+  logout: TLogoutMutationFn;
   user?: string | null;
   isUserError: boolean;
   isLogingIn: boolean;
+  isLoggingOut: boolean;
 }
 
 export const AuthContext = createContext<IAuthContext | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // const [user, setUser] = useState<TUser | null>(null);
-  // const [isLoadingUser, setIsLoadingUser] = useState<boolean>(false);
-  // const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
   const queryClient = useQueryClient();
-
-  const logout = () => {};
 
   const getCurrentUser = async () => {
     try {
@@ -52,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     staleTime: Infinity,
   });
 
-  const { mutate: loginMutate, isPending: isLogingIn } = useMutation({
+  const { mutate: login, isPending: isLogingIn } = useMutation({
     mutationFn: loginApi,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
@@ -80,9 +85,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
-  const login = (data: TLogin) => {
-    loginMutate({ data });
-  };
+  const { mutate: logout, isPending: isLoggingOut } = useMutation({
+    mutationFn: logoutApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      toast.success("Logged out successfully.");
+    },
+    onError: () => {
+      toast.error("Failed to log out.");
+    },
+  });
 
   return (
     <AuthContext.Provider
@@ -92,6 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user: data?.userId,
         login,
         logout,
+        isLoggingOut,
         getCurrentUser,
         isLogingIn,
       }}

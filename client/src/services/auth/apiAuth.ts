@@ -17,10 +17,15 @@ const login = ({ data }: { data: TLogin }): Promise<AxiosResponse<unknown>> =>
     withCredentials: true,
   });
 
+const logout = (): Promise<AxiosResponse<unknown>> =>
+  axios.post("/api/auth/logout", {
+    withCredentials: true,
+  });
+
 const userQueryOptions = queryOptions({
   queryKey: ["user"],
   queryFn: validateToken,
   staleTime: Infinity,
 });
 
-export { register, validateToken, userQueryOptions, login };
+export { register, validateToken, userQueryOptions, login, logout };

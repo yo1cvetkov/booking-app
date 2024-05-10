@@ -5,12 +5,19 @@ import { useAuth } from "@/hooks/use-auth";
 import { TLoginSchema, loginSchema } from "@/schemas/auth";
 import { userQueryOptions } from "@/services/auth/apiAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, createFileRoute, redirect } from "@tanstack/react-router";
+import { Link, createFileRoute, getRouteApi, redirect, useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const routeApi = getRouteApi("/login");
 
 const Login = () => {
   const { login, isLogingIn } = useAuth();
+
+  const navigate = useNavigate();
+
+  const search = routeApi.useSearch();
 
   const form = useForm<TLoginSchema>({
     defaultValues: {
@@ -21,7 +28,17 @@ const Login = () => {
   });
 
   function handleSubmit(data: TLoginSchema) {
-    login(data);
+    login(
+      { data },
+      {
+        onSuccess: () => {
+          navigate({ to: search.redirect });
+        },
+        onSettled: () => {
+          form.reset();
+        },
+      }
+    );
   }
 
   return (
@@ -31,7 +48,7 @@ const Login = () => {
           <h2 className="mt-6 text-3xl font-bold tracking-tight text-left text-gray-900">Log in to your account</h2>
           <p className="mt-2 text-sm text-left text-gray-600">
             Or
-            <Link to="/register" className="ml-1 font-medium text-primary hover:underline hover:underline-offset-2">
+            <Link to="/register" search={{ redirect: "/" }} className="ml-1 font-medium text-primary hover:underline hover:underline-offset-2">
               register for a new account
             </Link>
           </p>
@@ -85,4 +102,7 @@ export const Route = createFileRoute("/login")({
     }
   },
   component: Login,
+  validateSearch: z.object({
+    redirect: z.string().catch("/"),
+  }),
 });
