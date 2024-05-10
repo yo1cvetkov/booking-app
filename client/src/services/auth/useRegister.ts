@@ -1,12 +1,15 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { register } from "./apiAuth";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 
 const useRegister = () => {
+  const queryClient = useQueryClient();
+
   const { mutate, isPending } = useMutation({
     mutationFn: register,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
       toast.success("You have registered successfully.");
     },
     onError: (error) => {

@@ -11,3 +11,10 @@ export const registerSchema = z
   .refine((data) => data.password === data.confirmPassword, { message: "Passwords must match.", path: ["confirmPassword"] });
 
 export type TRegisterSchema = z.infer<typeof registerSchema>;
+
+export const loginSchema = z.object({
+  email: z.string({ required_error: "Email is required." }).email(),
+  password: z.string({ required_error: "Password is required." }).min(6, { message: "Password must be at least 6 characters long." }),
+});
+
+export type TLoginSchema = z.infer<typeof loginSchema>;

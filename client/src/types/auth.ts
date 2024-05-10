@@ -1,4 +1,4 @@
-import { TRegisterSchema } from "@/schemas/auth";
+import { TLoginSchema, TRegisterSchema } from "@/schemas/auth";
 
 type TUser = {
   email: string;
@@ -7,5 +7,6 @@ type TUser = {
 };
 
 type TRegister = Omit<TRegisterSchema, "confirmPassword">;
+type TLogin = TLoginSchema;
 
-export { type TUser, type TRegister };
+export { type TUser, type TRegister, type TLogin };

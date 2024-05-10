@@ -1,5 +1,6 @@
 import axios from "@/lib/api";
-import { TRegister } from "@/types/auth";
+import { type TRegister, type TLogin } from "@/types/auth";
+import { queryOptions } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 
 const register = ({ data }: { data: TRegister }): Promise<AxiosResponse<unknown>> => axios.post("/api/users/register", data);
@@ -11,4 +12,15 @@ const validateToken = () =>
     })
     .then((response) => response.data);
 
-export { register, validateToken };
+const login = ({ data }: { data: TLogin }): Promise<AxiosResponse<unknown>> =>
+  axios.post("/api/auth/login", data, {
+    withCredentials: true,
+  });
+
+const userQueryOptions = queryOptions({
+  queryKey: ["user"],
+  queryFn: validateToken,
+  staleTime: Infinity,
+});
+
+export { register, validateToken, userQueryOptions, login };
