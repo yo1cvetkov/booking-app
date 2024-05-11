@@ -10,7 +10,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { hotelFacilities, hotelTypes } from "@/lib/mockData";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, StarIcon, TrashIcon } from "lucide-react";
+import { Loader2, PlusIcon, StarIcon, TrashIcon } from "lucide-react";
+import { useCreateMyHotel } from "@/services/my-hotels/useCreateMyHotel";
 
 const AddHotel = () => {
   const form = useForm<TCreateMyHotelSchema>({
@@ -29,6 +30,8 @@ const AddHotel = () => {
     },
     resolver: zodResolver(createMyHotelSchema),
   });
+
+  const { mutate: createHotel, isPending: isCreatingHotel } = useCreateMyHotel();
 
   function handleSubmit(data: TCreateMyHotelSchema) {
     const formData = new FormData();
@@ -50,6 +53,8 @@ const AddHotel = () => {
     Array.from(data.imagesList).forEach((imageFile) => {
       formData.append(`imageFiles`, imageFile);
     });
+
+    createHotel({ data: formData });
   }
 
   const fileRef = form.register("imagesList");
@@ -70,7 +75,7 @@ const AddHotel = () => {
                 <FormItem className="space-y-2">
                   <FormLabel>Hotel Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder={"Enter hotel name"} />
+                    <Input {...field} placeholder={"Enter hotel name"} disabled={form.formState.isSubmitting || isCreatingHotel} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -84,7 +89,7 @@ const AddHotel = () => {
                   <FormItem className="space-y-2">
                     <FormLabel>City</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={"Enter city"} />
+                      <Input {...field} placeholder={"Enter city"} disabled={form.formState.isSubmitting || isCreatingHotel} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -97,7 +102,7 @@ const AddHotel = () => {
                   <FormItem className="space-y-2">
                     <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={"Enter country"} />
+                      <Input {...field} placeholder={"Enter country"} disabled={form.formState.isSubmitting || isCreatingHotel} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -111,7 +116,7 @@ const AddHotel = () => {
                 <FormItem className="space-y-2">
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder={"Enter hotel descitption"} />
+                    <Textarea {...field} placeholder={"Enter hotel descitption"} disabled={form.formState.isSubmitting || isCreatingHotel} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -134,6 +139,7 @@ const AddHotel = () => {
                           onChange={(event) => field.onChange(Number(event.target.value))}
                           placeholder={"Enter price per night"}
                           className="pl-8"
+                          disabled={form.formState.isSubmitting || isCreatingHotel}
                         />
                       </FormControl>
                     </div>
@@ -147,7 +153,11 @@ const AddHotel = () => {
                 render={({ field }) => (
                   <FormItem className="space-y-2">
                     <FormLabel>Star rating</FormLabel>
-                    <Select defaultValue={String(field.value)} onValueChange={(value) => field.onChange(Number(value))}>
+                    <Select
+                      defaultValue={String(field.value)}
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      disabled={form.formState.isSubmitting || isCreatingHotel}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select star rating" />
@@ -175,7 +185,12 @@ const AddHotel = () => {
                 <FormItem className="space-y-3">
                   <FormLabel>Hotel type</FormLabel>
                   <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-wrap">
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-wrap"
+                      disabled={form.formState.isSubmitting || isCreatingHotel}
+                    >
                       {hotelTypes.map(({ id, value, label, Icon }) => (
                         <FormItem key={id} className="flex items-center justify-center p-4 space-y-0 border rounded-lg cursor-pointer">
                           <FormControl>
@@ -214,6 +229,7 @@ const AddHotel = () => {
                               <FormControl>
                                 <Checkbox
                                   checked={field.value?.includes(value)}
+                                  disabled={form.formState.isSubmitting || isCreatingHotel}
                                   onCheckedChange={(checked: boolean) => {
                                     return checked
                                       ? field.onChange([...field.value, value])
@@ -243,7 +259,12 @@ const AddHotel = () => {
                   <FormItem className="space-y-2">
                     <FormLabel>Adults</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} onChange={(event) => field.onChange(Number(event.target.value))} />
+                      <Input
+                        type="number"
+                        {...field}
+                        onChange={(event) => field.onChange(Number(event.target.value))}
+                        disabled={form.formState.isSubmitting || isCreatingHotel}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -256,7 +277,12 @@ const AddHotel = () => {
                   <FormItem>
                     <FormLabel>Children</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} onChange={(event) => field.onChange(Number(event.target.value))} />
+                      <Input
+                        type="number"
+                        {...field}
+                        onChange={(event) => field.onChange(Number(event.target.value))}
+                        disabled={form.formState.isSubmitting || isCreatingHotel}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -279,7 +305,15 @@ const AddHotel = () => {
                           <PlusIcon className="w-8 h-8 text-gray-500 dark:text-gray-400" />
                           <span className="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">Add Image</span>
                         </label>
-                        <Input className="hidden" {...fileRef} id="image-upload" accept="image/*" multiple type="file" />
+                        <Input
+                          className="hidden"
+                          {...fileRef}
+                          id="image-upload"
+                          accept="image/*"
+                          multiple
+                          type="file"
+                          disabled={form.formState.isSubmitting || isCreatingHotel}
+                        />
                       </div>
                     </FormControl>
                   </div>
@@ -305,8 +339,8 @@ const AddHotel = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              Add Hotel
+            <Button type="submit" disabled={form.formState.isSubmitting || isCreatingHotel}>
+              {form.formState.isSubmitting || isCreatingHotel ? <Loader2 className="self-center w-4 h-4 animate-spin" /> : "Add Hotel"}
             </Button>
           </form>
         </Form>

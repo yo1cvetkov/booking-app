@@ -10,3 +10,9 @@ export const storage = {
   setToken: (token: string) => window.localStorage.setItem("token", JSON.stringify(token)),
   clearToken: () => window.localStorage.removeItem("token"),
 };
+
+export function printFormData(formData: FormData) {
+  for (const [key, value] of formData.entries()) {
+    console.log(`${key}:`, value);
+  }
+}
