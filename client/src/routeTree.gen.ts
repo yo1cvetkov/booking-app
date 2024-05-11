@@ -19,6 +19,7 @@ import { Route as IndexImport } from './routes/index'
 import { Route as AuthProfileImport } from './routes/_auth/profile'
 import { Route as AuthMyHotelsImport } from './routes/_auth/my-hotels'
 import { Route as AuthMyBookingsImport } from './routes/_auth/my-bookings'
+import { Route as AuthMyHotelsAddImport } from './routes/_auth/my-hotels_.add'
 
 // Create/Update Routes
 
@@ -62,6 +63,11 @@ const AuthMyBookingsRoute = AuthMyBookingsImport.update({
   getParentRoute: () => AuthRoute,
 } as any)
 
+const AuthMyHotelsAddRoute = AuthMyHotelsAddImport.update({
+  path: '/my-hotels/add',
+  getParentRoute: () => AuthRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -98,6 +104,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthProfileImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/my-hotels/add': {
+      preLoaderRoute: typeof AuthMyHotelsAddImport
+      parentRoute: typeof AuthImport
+    }
   }
 }
 
@@ -109,6 +119,7 @@ export const routeTree = rootRoute.addChildren([
     AuthMyBookingsRoute,
     AuthMyHotelsRoute,
     AuthProfileRoute,
+    AuthMyHotelsAddRoute,
   ]),
   AboutRoute,
   LoginRoute,
