@@ -154,6 +154,7 @@ const AddHotel = () => {
                   <FormItem className="space-y-2">
                     <FormLabel>Star rating</FormLabel>
                     <Select
+                      name="starRating"
                       defaultValue={String(field.value)}
                       onValueChange={(value) => field.onChange(Number(value))}
                       disabled={form.formState.isSubmitting || isCreatingHotel}
