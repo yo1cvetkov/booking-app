@@ -1,4 +1,5 @@
 import axios from "@/lib/api";
+import { type THotel } from "@/types/hotel";
 import { AxiosResponse } from "axios";
 
 const createMyHotel = ({ data }: { data: FormData }): Promise<AxiosResponse<unknown>> =>
@@ -9,4 +10,11 @@ const createMyHotel = ({ data }: { data: FormData }): Promise<AxiosResponse<unkn
     },
   });
 
-export { createMyHotel };
+const getMyHotels = () =>
+  axios
+    .get<THotel[]>("/api/my-hotels", {
+      withCredentials: true,
+    })
+    .then((response) => response.data);
+
+export { createMyHotel, getMyHotels };
